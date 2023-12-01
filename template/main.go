@@ -22,7 +22,7 @@ func main() {
 	fmt.Printf("  test: %s\n", part1(test_input))
 	fmt.Println("1.2")
 	start2 := time.Now()
-	real2 := part1(input)
+	real2 := part2(input)
 	duration2 := time.Since(start2)
 	fmt.Printf("  real: %s (%dms)\n", real2, duration2.Milliseconds())
 	fmt.Printf("  test: %s\n", part2(test_input))
