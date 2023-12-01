@@ -4,8 +4,9 @@ import (
 	_ "embed"
 	"fmt"
 	"strings"
-	"time"
 	"unicode"
+
+	"github.com/joerdav/advent-of-code-2023/display"
 )
 
 var (
@@ -18,19 +19,8 @@ var (
 )
 
 func main() {
-	fmt.Println("1.1")
-	start := time.Now()
-	real1 := part1(input)
-	duration := time.Since(start)
-	fmt.Printf("  real: %s (%v)\n", real1, duration)
-	fmt.Printf("  test: %s\n", part1(test_input))
-	fmt.Println("1.2")
-	start2 := time.Now()
-	real2 := part2(input)
-	duration2 := time.Since(start2)
-	fmt.Printf("  real: %s (%v)\n", real2, duration2)
-	fmt.Printf("  test: %s\n", part2(test_input2))
-
+	display.Print(1, 1, test_input, input, part1)
+	display.Print(1, 2, test_input2, input, part2)
 }
 
 func part1(input string) string {
@@ -64,7 +54,7 @@ func part2(input string) string {
 				break
 			}
 			if d := endsWithDigit(line[:i+1]); d != 0 {
-				result += d*10
+				result += d * 10
 				break
 			}
 		}
@@ -79,27 +69,16 @@ func part2(input string) string {
 				break
 			}
 		}
-
 	}
 	return fmt.Sprint(result)
 }
 
-var digits = []string{
-	"one",
-	"two",
-	"three",
-	"four",
-	"five",
-	"six",
-	"seven",
-	"eight",
-	"nine",
-}
+var digits = []string{"one", "two", "three", "four", "five", "six", "seven", "eight", "nine"}
 
 func endsWithDigit(s string) int {
 	for i, d := range digits {
 		if strings.HasSuffix(s, d) {
-			return i+1
+			return i + 1
 		}
 	}
 	return 0
@@ -107,7 +86,7 @@ func endsWithDigit(s string) int {
 func startsWithDigit(s string) int {
 	for i, d := range digits {
 		if strings.HasPrefix(s, d) {
-			return i+1
+			return i + 1
 		}
 	}
 	return 0
