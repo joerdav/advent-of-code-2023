@@ -51,8 +51,9 @@ type card struct {
 	foundScore            *int
 }
 
+var winningMap = make(map[string]bool, 10)
+
 func calcScore(win, card string) int {
-	winningMap := make(map[string]bool)
 	for _, num := range strings.Fields(strings.TrimSpace(win)) {
 		winningMap[num] = true
 	}
@@ -62,22 +63,21 @@ func calcScore(win, card string) int {
 			score++
 		}
 	}
+	clear(winningMap)
 	return score
 }
 func calcCards(cards []*card, card int) int {
+	c := cards[card]
+	if c.foundScore != nil {
+		return *c.foundScore
+	}
 	// 1 for original
 	score := 1
-	c := cards[card]
-	if c.foundScore == nil {
-		score := calcScore(c.winningNums, c.cardNums)
-		c.foundScore = &score
-	}
-	if *c.foundScore == 0 {
-		return score
-	}
-	for i := card+1; i<=card+*c.foundScore; i++ {
+	count := calcScore(c.winningNums, c.cardNums)
+	for i := card + 1; i <= card+count; i++ {
 		score += calcCards(cards, i)
 	}
+	c.foundScore = &score
 	return score
 }
 
