@@ -23,15 +23,17 @@ func main() {
 func part1(input string) string {
 	var total int
 	winningMap := make(map[string]bool)
-	for _, line := range strings.Split(strings.TrimSpace(input), "\n") {
-		_, card, _ := strings.Cut(line, ":")
-		winningNums, cardNums, _ := strings.Cut(strings.TrimSpace(card), "|")
-		for _, num := range strings.Fields(strings.TrimSpace(winningNums)) {
-			winningMap[num] = true
+	lines := strings.Split(strings.TrimSpace(input), "\n")
+	gameCut := strings.IndexRune(lines[0], ':')
+	cardCut := strings.IndexRune(lines[0], '|')
+	for _, line := range lines {
+		winningNums, cardNums := line[gameCut+1:cardCut], line[cardCut+1:]
+		for i := 0; i+2 < len(winningNums); i += 3 {
+			winningMap[winningNums[i:i+3]] = true
 		}
 		var score int
-		for _, num := range strings.Fields(strings.TrimSpace(cardNums)) {
-			if !winningMap[num] {
+		for i := 0; i+2 < len(cardNums); i += 3 {
+			if !winningMap[cardNums[i:i+3]] {
 				continue
 			}
 			if score == 0 {
@@ -54,12 +56,12 @@ type card struct {
 var winningMap = make(map[string]bool, 10)
 
 func calcScore(win, card string) int {
-	for _, num := range strings.Fields(strings.TrimSpace(win)) {
-		winningMap[num] = true
+	for i := 0; i+2 < len(win); i += 3 {
+		winningMap[win[i:i+3]] = true
 	}
 	var score int
-	for _, num := range strings.Fields(strings.TrimSpace(card)) {
-		if winningMap[num] {
+	for i := 0; i+2 <= len(card); i += 3 {
+		if winningMap[card[i:i+3]] {
 			score++
 		}
 	}
@@ -85,9 +87,10 @@ func part2(input string) string {
 	var total int
 	lines := strings.Split(strings.TrimSpace(input), "\n")
 	cards := make([]*card, len(lines))
+	gameCut := strings.IndexRune(lines[0], ':')
+	cardCut := strings.IndexRune(lines[0], '|')
 	for i, line := range lines {
-		_, cardString, _ := strings.Cut(line, ":")
-		winningNums, cardNums, _ := strings.Cut(strings.TrimSpace(cardString), "|")
+		winningNums, cardNums := line[gameCut+1:cardCut], line[cardCut+1:]
 		cards[i] = &card{winningNums, cardNums, nil}
 	}
 	for i := range cards {
