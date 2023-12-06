@@ -7,6 +7,7 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/joerdav/advent-of-code-2023/display"
 )
@@ -109,25 +110,39 @@ func part2(input string) string {
 		slices.SortFunc(mi.maps, func(l, r idMapItem) int { return l.source - r.source })
 		idMaps[from] = mi
 	}
-	result := math.MaxInt
 	seedsString := strings.Split(lines[0], ": ")[1]
 	seedStrings := strings.Fields(strings.TrimSpace(seedsString))
+	result := math.MaxInt
+	var resultMutex sync.Mutex
+	var wg sync.WaitGroup
 	for i := 0; i < len(seedStrings); i += 2 {
 		v, _ := strconv.Atoi(seedStrings[i])
 		r, _ := strconv.Atoi(seedStrings[i+1])
-		for x := v; x < v+r; x++ {
-			val := x
-			curr := "seed"
-			for {
-				m, ok := idMaps[curr]
-				if !ok {
-					break
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			subResult := math.MaxInt
+			for x := v; x < v+r; x++ {
+				val := x
+				curr := "seed"
+				for {
+					m, ok := idMaps[curr]
+					if !ok {
+						break
+					}
+					curr = m.to
+					val = m.convert(val)
 				}
-				curr = m.to
-				val = m.convert(val)
+				if result < val {
+					return
+				}
+				subResult = min(subResult, val)
 			}
-			result = min(result, val)
-		}
+			resultMutex.Lock()
+			defer resultMutex.Unlock()
+			result = min(result, subResult)
+		}()
 	}
+	wg.Wait()
 	return fmt.Sprint(result)
 }
