@@ -7,7 +7,6 @@ import (
 	"unicode"
 
 	"github.com/joerdav/advent-of-code-2023/display"
-	"github.com/joerdav/advent-of-code-2023/iter"
 )
 
 var (
@@ -25,47 +24,53 @@ func main() {
 }
 
 func part1(input string) string {
-	lines := iter.StringSplit(input, "\n")
-	result := iter.Acc(lines, 0,
-		func(line string, a int) int {
-			if d, ok := iter.First(iter.New([]rune(line)), unicode.IsDigit); ok {
-				a += int((d - '0') * 10)
-			}
-			if d, ok := iter.Last(iter.New([]rune(line)), unicode.IsDigit); ok {
-				a += int(d - '0')
-			}
-			return a
-		})
-	return fmt.Sprint(result)
-}
-
-func part2(input string) string {
-	lines := iter.StringSplit(input, "\n")
-	result := iter.Acc(lines, 0, func(line string, a int) int {
-		for i := 0; i < len(line); i++ {
-			r := []rune(line)[i]
+	var result int
+	for _, line := range strings.Split(input, "\n") {
+		for _, r := range line {
 			if unicode.IsDigit(r) {
-				a += int((r - '0') * 10)
-				break
-			}
-			if d := endsWithDigit(line[:i+1]); d != 0 {
-				a += d * 10
+				result += int((r - '0') * 10)
 				break
 			}
 		}
 		for i := len(line) - 1; i >= 0; i-- {
 			r := []rune(line)[i]
 			if unicode.IsDigit(r) {
-				a += int((r - '0'))
-				break
-			}
-			if d := startsWithDigit(line[i:]); d != 0 {
-				a += d
+				result += int((r - '0'))
 				break
 			}
 		}
-		return a
-	})
+
+	}
+	return fmt.Sprint(result)
+}
+
+func part2(input string) string {
+	var result int
+	for _, line := range strings.Split(input, "\n") {
+		for i := 0; i < len(line); i++ {
+			r := []rune(line)[i]
+			if unicode.IsDigit(r) {
+				result += int((r - '0') * 10)
+				break
+			}
+			if d := endsWithDigit(line[:i+1]); d != 0 {
+				result += d*10
+				break
+			}
+		}
+		for i := len(line) - 1; i >= 0; i-- {
+			r := []rune(line)[i]
+			if unicode.IsDigit(r) {
+				result += int((r - '0'))
+				break
+			}
+			if d := startsWithDigit(line[i:]); d != 0 {
+				result += d
+				break
+			}
+		}
+
+	}
 	return fmt.Sprint(result)
 }
 
