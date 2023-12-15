@@ -3,6 +3,7 @@ package main
 import (
 	_ "embed"
 	"fmt"
+	"math/bits"
 	"regexp"
 	"strconv"
 	"strings"
@@ -71,21 +72,33 @@ func part1(input string) string {
 	return fmt.Sprint(total)
 }
 
+var (
+	unknown = regexp.MustCompile("\\?")
+	damaged = regexp.MustCompile("#")
+)
+
 func part2(input string) string {
 	var total int
 	for _, line := range strings.Split(input, "\n") {
-		fmt.Print(".")
 		springs, grs, _ := strings.Cut(line, " ")
 		springs = strings.Join([]string{springs, springs, springs, springs, springs}, "?")
 		grs = strings.Join([]string{grs, grs, grs, grs, grs}, ",")
 		var groups []int
+		var target int
 		for _, i := range strings.Split(grs, ",") {
 			n, _ := strconv.Atoi(i)
+			target += n
 			groups = append(groups, n)
 		}
-		slots := regexp.MustCompile("\\?").FindAllIndex([]byte(springs), -1)
+		slots := unknown.FindAllIndex([]byte(springs), -1)
+		knownDamaged := damaged.FindAllIndex([]byte(springs), -1)
+		unknownDamaged := target - len(knownDamaged)
 		possibilities := pow(2, len(slots))
+		var subtotal int
 		for i := 0; i <= possibilities; i++ {
+			if bits.OnesCount(uint(i)) != unknownDamaged {
+				continue
+			}
 			curr := []rune(springs)
 			for idx, sl := range slots {
 				curr[sl[0]] = '.'
@@ -94,9 +107,11 @@ func part2(input string) string {
 				}
 			}
 			if check(string(curr), groups) {
-				total++
+				subtotal++
 			}
 		}
+		fmt.Println(subtotal)
+		total += subtotal
 	}
 	return fmt.Sprint(total * 5)
 }
